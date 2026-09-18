@@ -57,6 +57,7 @@ import { MarkdownEditor } from '@/components/MarkdownEditor';
 import { ManageParticipantsDialog } from '@/features/admin/components/ManageParticipantsDialog';
 import { SwitchField } from '@/features/admin/components/SwitchField';
 import { getContestStatus } from '@/features/contest/utils/status';
+import { publicScoreboardHref } from '@/features/rankings/public-scoreboard';
 import { useTableSearchParams } from '@/hooks/use-table-search-params';
 
 // -- Data fetcher --
@@ -843,6 +844,16 @@ function useContestColumns({
             <DropdownMenuItem onClick={() => onBulkParticipants(row.original)}>
               <Users className="h-4 w-4" />
               {t('admin.bulkParticipantsAction')}
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                to={publicScoreboardHref(row.original.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Eye className="h-4 w-4" />
+                {t('ranking.showPublic')}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onConfigure(row.original)}>
               <Settings className="h-4 w-4" />

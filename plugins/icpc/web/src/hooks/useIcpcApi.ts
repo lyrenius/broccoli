@@ -43,9 +43,9 @@ export function useIcpcApi() {
           `${PLUGIN_BASE}/contests/${contestId}/info`,
         ),
 
-      getStandings: (contestId: number) =>
+      getStandings: (contestId: number, publicView = false) =>
         fetchJson<StandingsResponse>(
-          `${PLUGIN_BASE}/contests/${contestId}/standings`,
+          `${PLUGIN_BASE}/contests/${contestId}/standings${publicView ? '?view=public' : ''}`,
         ),
 
       reveal: (contestId: number) =>

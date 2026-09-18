@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-#[cfg(target_arch = "wasm32")]
-use broccoli_server_sdk::permissions as perm;
 use broccoli_server_sdk::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -514,7 +512,8 @@ pub(crate) fn handle_scoreboard(
 
     // Before the contest ends, full scoreboard visibility is controlled by
     // contest config; organizers always retain full visibility for supervision.
-    let can_view_all = req.has_permission(perm::CONTEST_MANAGE);
+    let viewer = broccoli_server_sdk::scoreboard::Viewer::from_request(req);
+    let can_view_all = viewer.can_view_all;
     let full_scoreboard_visible = full_scoreboard_visible_for_phase(
         phase,
         can_view_all,
@@ -522,7 +521,7 @@ pub(crate) fn handle_scoreboard(
     );
     let visible_participants: Vec<&Participant> = participants
         .iter()
-        .filter(|p| full_scoreboard_visible || req.user_id() == Some(p.user_id))
+        .filter(|p| full_scoreboard_visible || viewer.user_id == Some(p.user_id))
         .collect();
     let visible_user_ids: Vec<i32> = visible_participants.iter().map(|p| p.user_id).collect();
     let scoreboard_cells = load_scoreboard_cells(

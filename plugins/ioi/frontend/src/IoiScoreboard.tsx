@@ -10,6 +10,7 @@ import type { ScoreboardEntry, ScoreboardResponse } from './types';
 
 interface IoiScoreboardProps {
   contestId?: number;
+  publicView?: boolean;
   children?: ReactNode;
 }
 
@@ -162,7 +163,11 @@ function ScoreCell({ score, max }: { score: number; max: number }) {
   );
 }
 
-export function IoiScoreboard({ contestId, children }: IoiScoreboardProps) {
+export function IoiScoreboard({
+  contestId,
+  publicView = false,
+  children,
+}: IoiScoreboardProps) {
   const { isIoi, isLoading: guardLoading } = useIsIoiContest(contestId);
   const api = useIoiApi();
   const { t } = useTranslation();
@@ -179,9 +184,9 @@ export function IoiScoreboard({ contestId, children }: IoiScoreboardProps) {
     isError,
     dataUpdatedAt,
   } = useQuery<ScoreboardResponse>({
-    queryKey: ['ioi-scoreboard', contestId],
+    queryKey: ['ioi-scoreboard', contestId, publicView ? 'public' : 'default'],
     enabled: !!contestId && isIoi,
-    queryFn: () => api.getScoreboard(contestId!),
+    queryFn: () => api.getScoreboard(contestId!, publicView),
     retry: 2,
     refetchInterval: (query: { state: { data?: ScoreboardResponse } }) =>
       autoRefresh && query.state.data?.phase === 'during' ? 30000 : false,

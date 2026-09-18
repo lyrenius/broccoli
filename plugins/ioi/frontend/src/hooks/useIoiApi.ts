@@ -51,9 +51,9 @@ export function useIoiApi() {
           `${PLUGIN_BASE}/contests/${contestId}/info`,
         ),
 
-      getScoreboard: (contestId: number) =>
+      getScoreboard: (contestId: number, publicView = false) =>
         fetchJson<ScoreboardResponse>(
-          `${PLUGIN_BASE}/contests/${contestId}/scoreboard`,
+          `${PLUGIN_BASE}/contests/${contestId}/scoreboard${publicView ? '?view=public' : ''}`,
         ),
 
       getTaskConfig: (contestId: number, problemId: number) =>

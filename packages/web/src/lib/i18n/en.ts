@@ -304,6 +304,13 @@ export const en: Record<string, string> = {
 
   // Ranking
   'ranking.title': 'Ranking',
+  'ranking.showPublic': 'Show Public Scoreboard',
+  'ranking.publicTitle': 'Public Scoreboard',
+  'ranking.publicNotice':
+    'This view follows public scoreboard settings without organizer or personal-score exceptions. Anonymous access also requires an active, public contest. A scoreboard can remain hidden until the configured publication phase.',
+  'ranking.backToRanking': 'Back to my ranking view',
+  'ranking.publicUnsupported':
+    'This contest format has not implemented public scoreboard viewing.',
   'ranking.user': 'User',
   'ranking.solved': 'Solved',
   'ranking.score': 'Score',

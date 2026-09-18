@@ -3,6 +3,9 @@ pub mod evaluate;
 pub mod persist;
 pub mod standings;
 
+#[cfg(test)]
+mod public_scoreboard_tests;
+
 /// Whether a viewer looking at someone ELSE's submission must have its judged
 /// outcome hidden. Enforces on the generic GET /submissions endpoints the same
 /// two scoreboard-integrity rules `handle_standings` enforces on its own view:
@@ -739,13 +742,14 @@ fn handle_standings(host: &Host, req: &PluginHttpRequest) -> Result<PluginHttpRe
         username: String,
     }
     let phase = &info.phase;
-    let can_view_all = req.has_permission(perm::CONTEST_MANAGE);
+    let viewer = broccoli_server_sdk::scoreboard::Viewer::from_request(req);
+    let can_view_all = viewer.can_view_all;
     // Restrict a contestant to their own row during the contest UNLESS the
     // organizer opted into a public live scoreboard. Organizers always see all.
     let is_restricted =
         (phase == "before" || phase == "during") && !can_view_all && !config.public_standings;
     let restricted_user_id = if is_restricted {
-        match req.user_id() {
+        match viewer.user_id {
             Some(uid) => Some(uid),
             None => {
                 return Ok(PluginHttpResponse {
@@ -847,7 +851,7 @@ fn handle_standings(host: &Host, req: &PluginHttpRequest) -> Result<PluginHttpRe
     // always sees their OWN submissions un-frozen (real verdicts on their row), so
     // only OTHER teams are hidden. When not frozen, freeze_start_ms = i64::MAX so
     // everything is live and this is a no-op.
-    let own_uid = req.user_id();
+    let own_uid = viewer.user_id;
     let (pre_freeze, during_freeze): (Vec<StandingsSubmission>, Vec<StandingsSubmission>) =
         standings_submissions
             .into_iter()

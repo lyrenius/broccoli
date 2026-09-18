@@ -4,9 +4,9 @@ import { useTranslation } from '@broccoli/web-sdk/i18n';
 import { CONTEST_MANAGE } from '@broccoli/web-sdk/permissions';
 import { Button } from '@broccoli/web-sdk/ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Flame, List, Pencil, Trash2, Users } from 'lucide-react';
+import { Eye, Flame, List, Pencil, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import {
   ContestFormDialog,
@@ -14,6 +14,7 @@ import {
 } from '@/features/admin/components/AdminContestsTab';
 import { ManageParticipantsDialog } from '@/features/admin/components/ManageParticipantsDialog';
 import { PrewarmDialog } from '@/features/contest/components/PrewarmDialog';
+import { publicScoreboardHref } from '@/features/rankings/public-scoreboard';
 
 export function ContestAdminActions() {
   const { contestId } = useParams();
@@ -62,6 +63,21 @@ export function ContestAdminActions() {
       <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-2">
         {t('admin.actions')}
       </p>
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="w-full justify-start gap-2 h-8 text-xs"
+      >
+        <Link
+          to={publicScoreboardHref(id)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Eye className="h-3.5 w-3.5" />
+          {t('ranking.showPublic')}
+        </Link>
+      </Button>
       <Button
         variant="ghost"
         size="sm"

@@ -10,6 +10,7 @@ import type { ProblemCell, StandingsEntry, StandingsResponse } from './types';
 
 interface IcpcScoreboardProps {
   contestId?: number;
+  publicView?: boolean;
   children?: ReactNode;
 }
 
@@ -163,7 +164,11 @@ function ProblemCellView({ cell }: { cell: ProblemCell | undefined }) {
   );
 }
 
-export function IcpcScoreboard({ contestId, children }: IcpcScoreboardProps) {
+export function IcpcScoreboard({
+  contestId,
+  publicView = false,
+  children,
+}: IcpcScoreboardProps) {
   const { isIcpc, isLoading: guardLoading } = useIsIcpcContest(contestId);
   const api = useIcpcApi();
   const { t } = useTranslation();
@@ -179,9 +184,9 @@ export function IcpcScoreboard({ contestId, children }: IcpcScoreboardProps) {
     dataUpdatedAt,
     refetch,
   } = useQuery<StandingsResponse>({
-    queryKey: ['icpc-standings', contestId],
+    queryKey: ['icpc-standings', contestId, publicView ? 'public' : 'default'],
     enabled: !!contestId && isIcpc,
-    queryFn: () => api.getStandings(contestId!),
+    queryFn: () => api.getStandings(contestId!, publicView),
     retry: 2,
     refetchInterval: (query: { state: { data?: StandingsResponse } }) => {
       const d = query.state.data;
@@ -193,7 +198,7 @@ export function IcpcScoreboard({ contestId, children }: IcpcScoreboardProps) {
   });
 
   const handleReveal = async () => {
-    if (!contestId) return;
+    if (!contestId || publicView) return;
     // Reveal is final and cannot be undone from the UI - confirm first.
     if (!window.confirm(t('icpc.scoreboard.revealConfirm'))) return;
     setRevealing(true);
@@ -249,7 +254,7 @@ export function IcpcScoreboard({ contestId, children }: IcpcScoreboardProps) {
               {t('icpc.scoreboard.revealFailed')}
             </span>
           )}
-          {can_reveal && (
+          {!publicView && can_reveal && (
             <button
               type="button"
               onClick={handleReveal}
